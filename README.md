@@ -4,6 +4,8 @@
 开机自启后常驻系统托盘：检测到没认证就自动登录，掉线自动重连，需要时还会自动把
 无线网连回校园网。所有代码只做本地认证，不依赖任何服务器，密码用 Windows DPAPI 加密保存。
 
+打包好的可执行文件在 **[Releases](https://github.com/Mrio10086/sicau-net-login/releases/latest)** 页面，不用装 Python。
+
 ## 它是怎么工作的
 
 这套流程是 2026-09 在真实网络里抓出来的，不是猜的：
@@ -25,7 +27,7 @@
 
 ## 用法一：直接用打包好的 exe（不需要 Python）
 
-`dist\` 里已经有两个打包好的程序：
+到 [Releases](https://github.com/Mrio10086/sicau-net-login/releases/latest) 下载这两个文件：
 
 | 文件 | 说明 |
 | --- | --- |
