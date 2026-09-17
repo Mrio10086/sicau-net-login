@@ -33,28 +33,26 @@ jobs:
         run: python -m pytest -q
       - name: 生成图标
         run: python tools/make_icon.py
-      - name: 打包托盘版
-        run: >
-          python -m PyInstaller
-          --noconfirm --clean
-          --icon packaging/app.ico
-          --paths src
-          --hidden-import pystray._win32
-          --exclude-module matplotlib --exclude-module numpy --exclude-module pandas
-          --exclude-module PyQt5 --exclude-module PySide6
-          --distpath dist --workpath build --specpath build
-          --windowed --onefile --name sicau-net-login build_entry.py
-      - name: 打包命令行版
-        run: >
-          python -m PyInstaller
-          --noconfirm --clean
-          --icon packaging/app.ico
-          --paths src
-          --hidden-import pystray._win32
-          --exclude-module matplotlib --exclude-module numpy --exclude-module pandas
-          --exclude-module PyQt5 --exclude-module PySide6
-          --distpath dist --workpath build --specpath build
-          --console --onefile --name sicau-net-login-cli cli_entry.py
+      - name: 打包 exe
+        shell: pwsh
+        run: |
+          # spec 生成在 build/ 下，而 spec 里的相对路径以 spec 所在目录为基准，
+          # 所以 icon 和入口脚本必须给绝对路径（和本地 build.ps1 一致）。
+          $common = @(
+            '--noconfirm', '--clean',
+            '--icon', "$env:GITHUB_WORKSPACE/packaging/app.ico",
+            '--paths', "$env:GITHUB_WORKSPACE/src",
+            '--hidden-import', 'pystray._win32',
+            '--exclude-module', 'matplotlib', '--exclude-module', 'numpy',
+            '--exclude-module', 'pandas', '--exclude-module', 'PyQt5',
+            '--exclude-module', 'PySide6',
+            '--distpath', 'dist', '--workpath', 'build', '--specpath', 'build'
+          )
+          python -m PyInstaller @common --windowed --onefile --name sicau-net-login "$env:GITHUB_WORKSPACE/build_entry.py"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python -m PyInstaller @common --console --onefile --name sicau-net-login-cli "$env:GITHUB_WORKSPACE/cli_entry.py"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Get-ChildItem dist/*.exe | Select-Object Name, Length
       - uses: actions/upload-artifact@v7
         with:
           name: sicau-net-login-exe
