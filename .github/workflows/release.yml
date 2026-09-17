@@ -66,8 +66,28 @@ jobs:
         run: |
           $tag = '${{ inputs.tag }}'
           if (-not $tag) { $tag = $env:GITHUB_REF_NAME }
-          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+
+          # 把 sha256 写进 Release 说明，方便别人核对下载到的 exe
+          $rows = Get-ChildItem dist/*.exe | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            $mb = [math]::Round($_.Length / 1MB, 1)
+            "- ``$($_.Name)`` — $mb MB — ``sha256:$hash``"
+          }
+          $body = @(
+            '## 下载',
+            '',
+            '- `sicau-net-login.exe` — 托盘版，**双击即用**，没有控制台黑框',
+            '- `sicau-net-login-cli.exe` — 命令行版，排错用（`sicau-net-login-cli.exe status`）',
+            '',
+            '## 校验（sha256）',
+            ''
+          ) + $rows + @('', '用法、原理和排错见仓库 README。')
+          $body | Set-Content -Path release-body.md -Encoding utf8
+
+          gh release view $tag --repo $env:GITHUB_REPOSITORY --json tagName 1>$null 2>$null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --repo $env:GITHUB_REPOSITORY --title "$tag — 川农校园网自动登录（Windows）" --generate-notes
+            gh release create $tag --repo $env:GITHUB_REPOSITORY --title "$tag — 川农校园网自动登录（Windows）" --notes-file release-body.md
+          } else {
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --notes-file release-body.md
           }
           gh release upload $tag --repo $env:GITHUB_REPOSITORY --clobber dist/sicau-net-login.exe dist/sicau-net-login-cli.exe

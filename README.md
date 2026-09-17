@@ -186,6 +186,34 @@ python -m pytest -q
 - BRAS 名和门户 IP 会随校区（雅安 / 成都 / 都江堰）不同；程序优先自动获取，
   配置里的值只是兜底，可在设置里改。
 
+## 杀软误报与代码签名
+
+exe 是 PyInstaller 打的、**没做代码签名**，所以第一次运行可能遇到：
+
+- Windows 弹「已保护你的电脑 / 未知发布者」——点「更多信息 → 仍要运行」即可。
+- 少数杀软会把 PyInstaller 的单文件 exe 启发式判成可疑（打包器本身常被误报）。
+  介意的话从源码跑（见[用法二](#用法二直接用源码跑)），或者自己打包。
+
+**先确认文件没被动过。** 每个 Release 的说明里都列了两个 exe 的 `sha256`，
+和本地算出来的对一下就行：
+
+```powershell
+Get-FileHash .\sicau-net-login.exe -Algorithm SHA256
+```
+
+**想自己签名**（需要一张代码签名证书，个人自用可以先用自签名证书走通流程）：
+
+```powershell
+signtool sign /fd SHA256 /td SHA256 /tr http://timestamp.digicert.com `
+  /f mycert.pfx /p 证书密码 dist\sicau-net-login.exe dist\sicau-net-login-cli.exe
+```
+
+`signtool` 来自 Windows SDK。两点提醒：
+
+- 自签名证书只能让文件「有签名」，**消不掉 SmartScreen 的未知发布者警告**；
+  要消掉得买 OV / EV 证书并慢慢攒下载声誉，个人自用没必要。
+- 签名要在 PyInstaller 打包**之后**做，exe 重新生成一次就要重签一次。
+
 ## 许可
 
 [MIT](LICENSE)
