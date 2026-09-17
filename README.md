@@ -167,12 +167,18 @@ python -m pytest -q
 用桩对象验证登录/离线请求的地址与字段、参数兜底、退避重试、暂停逻辑。
 不会真的发起认证请求。
 
+推送到 GitHub 后由 Actions 自动在 `windows-latest` 上跑一遍（Python 3.10 / 3.13）。
+
 ## 已知限制
 
 - 只支持 Windows（依赖 DPAPI、`netsh`、`NotifyAddrChange`）。
 - 单账号；不做修改密码、套餐变更等门户上其他功能。
 - BRAS 名和门户 IP 会随校区（雅安 / 成都 / 都江堰）不同；程序优先自动获取，
   配置里的值只是兜底，可在设置里改。
+
+## 许可
+
+[MIT](LICENSE)
 
 
 
