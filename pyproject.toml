@@ -1,0 +1,9 @@
+[project]
+name = "sicau-net-login"
+version = "0.1.0"
+description = "四川农业大学校园网(i_sicau_wifi6)自动登录守护程序"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
