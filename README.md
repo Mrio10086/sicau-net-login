@@ -106,6 +106,16 @@ python cli.py status -v  # 附带调试输出
 脚本会自己装 `pyinstaller`、跑单元测试、用 `tools/make_icon.py` 生成和多尺寸图标
 （和托盘图标同一套画法）。exe 图标就是右下角那个绿点。
 
+不想在本地打包，也可以推个 tag 让 GitHub 代劳：
+
+```powershell
+git tag -a v1.0.2 -m "改了什么"
+git push origin v1.0.2
+```
+
+`.github/workflows/release.yml` 会在 `windows-latest` 上跑测试、打包两个 exe，
+并把它们附加到同名 Release；`.github/workflows/tests.yml` 负责每次 push / PR 跑测试。
+
 几点说明：
 
 - 单文件版每次启动会把自己解压到 `%TEMP%`，实测启动到完成一次状态检测约 0.5 秒，感知不到。
