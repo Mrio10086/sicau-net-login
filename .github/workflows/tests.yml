@@ -9,6 +9,10 @@ on:
 jobs:
   pytest:
     runs-on: windows-latest
+    env:
+      # 运行器默认 cp1252，测试里打印中文会 UnicodeEncodeError
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
     strategy:
       fail-fast: false
       matrix:
